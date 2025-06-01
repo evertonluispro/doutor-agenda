@@ -9,7 +9,15 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Sidebar,
   SidebarContent,
@@ -22,7 +30,6 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { authClient } from "@/lib/auth-client";
 
 const items = [
@@ -49,9 +56,19 @@ const items = [
 ];
 
 export function AppSidebar() {
+  const router = useRouter();
+  const session = authClient.useSession();
+  const pathname = usePathname();
+
   const handleSignOut = async () => {
-    await authClient.signOut();
-  }
+    await authClient.signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          router.push("/authentication");
+        },
+      },
+    });
+  };
   return (
     <Sidebar>
       <SidebarHeader className="border-b p-4">
