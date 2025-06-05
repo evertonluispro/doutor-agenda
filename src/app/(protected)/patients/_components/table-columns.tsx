@@ -1,77 +1,53 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
 
-import { appointmentsTable } from "@/db/schema";
+import { patientsTable } from "@/db/schema";
 
-import AppointmentsTableActions from "./table-actions";
+import PatientsTableActions from "./table-actions";
 
-type AppointmentWithRelations = typeof appointmentsTable.$inferSelect & {
-  patient: {
-    id: string;
-    name: string;
-    email: string;
-    phoneNumber: string;
-    sex: "male" | "female";
-  };
-  doctor: {
-    id: string;
-    name: string;
-    specialty: string;
-  };
-};
+type Patient = typeof patientsTable.$inferSelect;
 
-export const appointmentsTableColumns: ColumnDef<AppointmentWithRelations>[] = [
+export const patientsTableColumns: ColumnDef<Patient>[] = [
   {
-    id: "patient",
-    accessorKey: "patient.name",
-    header: "Paciente",
+    id: "name",
+    accessorKey: "name",
+    header: "Nome",
   },
   {
-    id: "doctor",
-    accessorKey: "doctor.name",
-    header: "Médico",
+    id: "email",
+    accessorKey: "email",
+    header: "Email",
+  },
+  {
+    id: "phoneNumber",
+    accessorKey: "phoneNumber",
+    header: "Telefone",
     cell: (params) => {
-      const appointment = params.row.original;
-      return `${appointment.doctor.name}`;
+      const patient = params.row.original;
+      const phoneNumber = patient.phoneNumber;
+      if (!phoneNumber) return "";
+      const formatted = phoneNumber.replace(
+        /(\d{2})(\d{5})(\d{4})/,
+        "($1) $2-$3",
+      );
+      return formatted;
     },
   },
   {
-    id: "date",
-    accessorKey: "date",
-    header: "Data e Hora",
+    id: "sex",
+    accessorKey: "sex",
+    header: "Sexo",
     cell: (params) => {
-      const appointment = params.row.original;
-      return format(new Date(appointment.date), "dd/MM/yyyy 'às' HH:mm", {
-        locale: ptBR,
-      });
-    },
-  },
-  {
-    id: "specialty",
-    accessorKey: "doctor.specialty",
-    header: "Especialidade",
-  },
-  {
-    id: "price",
-    accessorKey: "appointmentPriceInCents",
-    header: "Valor",
-    cell: (params) => {
-      const appointment = params.row.original;
-      const price = appointment.appointmentPriceInCents / 100;
-      return new Intl.NumberFormat("pt-BR", {
-        style: "currency",
-        currency: "BRL",
-      }).format(price);
+      const patient = params.row.original;
+      return patient.sex === "male" ? "Masculino" : "Feminino";
     },
   },
   {
     id: "actions",
     cell: (params) => {
-      const appointment = params.row.original;
-      return <AppointmentsTableActions appointment={appointment} />;
+      const patient = params.row.original;
+      return <PatientsTableActions patient={patient} />;
     },
   },
 ];

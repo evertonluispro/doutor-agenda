@@ -91,6 +91,7 @@ const AddAppointmentForm = ({
     },
   });
 
+
   const selectedDoctorId = form.watch("doctorId");
   const selectedPatientId = form.watch("patientId");
   const selectedDate = form.watch("date");
