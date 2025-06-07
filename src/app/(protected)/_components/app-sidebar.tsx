@@ -2,6 +2,7 @@
 
 import {
   CalendarDays,
+  Diamond,
   Gem,
   LayoutDashboard,
   LogOut,
